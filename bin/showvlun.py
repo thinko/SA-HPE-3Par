@@ -2,22 +2,30 @@
 
 from hp3parclient import client, exceptions
 import json
- 
+
+# for DNS fill in domain name, for IPs please leave DOMAIN blank ("")
+# hostnames or IP addresses
 SERVERS = ['3par1','3par2']
+DOMAIN = 'example.com'
+SSHPORT = 'port=22'
 USERNAME = 'user'
 PASSWORD = 'password'
 COMMAND = 'showvlun'
-CMD_WITH_ARGS = [COMMAND,'-a','-showcols', 'Lun,VVName,HostName,VV_WWN,Port,Host_WWN']
+
+CMD_WITH_ARGS = [COMMAND, '-a', '-showcols', 'Lun,VVName,HostName,VV_WWN,Port,Host_WWN']
  
 for SERVER in SERVERS:
-    SERVER_NAME = SERVER + '.example.com'
-    ssh_client = client.ssh.HP3PARSSHClient(SERVER_NAME, USERNAME, PASSWORD, port=22)
+    if DOMAIN == "":
+      SERVER_NAME = SERVER
+    else:
+      SERVER_NAME = SERVER + '.' + DOMAIN
+    ssh_client = client.ssh.HP3PARSSHClient(SERVER_NAME, USERNAME, PASSWORD, SSHPORT)
  
     #logging in
     try:
         ssh_client.open()
     except:
-        print 'login failed on SERVER: ' + SERVER
+        print 'Login Failed on 3PAR array: ' + SERVER
  
     #run the command
     CMD_RETURN = ssh_client.run(CMD_WITH_ARGS)
